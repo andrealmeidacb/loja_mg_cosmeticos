@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Novo Produto — MG COSMETICOS{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'css/manage_products.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="container create-product-section" style="max-width: 650px; margin: 3rem auto;">
+  
+  <div class="section-head" style="margin-bottom: 1.5rem;">
+    <div>
+      <p class="eyebrow">PAINEL DE CONTROLE</p>
+      <h2>Cadastrar Novo Produto</h2>
+    </div>
+    <a href="{% url 'manage_products' %}" class="btn btn-secondary">← Voltar para Gestão</a>
+  </div>
+
+  {% if messages %}
+    <div class="messages-container">
+      {% for message in messages %}
+        <div class="alert-message alert-error">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="card-form-container" style="background: #fff; padding: 2rem; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow);">
+    <form method="post" action="{% url 'create_product' %}" class="product-grid-form">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label class="form-label">Código (ID Opcional)</label>
+        <input type="number" name="custom_id" placeholder="Ex: 101 (opcional)" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nome do Produto *</label>
+        <input type="text" name="name" required placeholder="Ex: Vestido Seda Rosa" class="form-control">
+      </div>
+
+      <div class="form-group full-width">
+        <label class="form-label">Categoria * (Escolha ou digite uma nova)</label>
+        <input type="text" name="category_name" list="categories-list" required placeholder="Digite o nome da categoria..." class="form-control">
+        <datalist id="categories-list">
+          {% for cat in categories %}
+            <option value="{{ cat.name }}">
+          {% endfor %}
+        </datalist>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Preço de Custo (R$)</label>
+        <input type="number" step="0.01" name="cost" value="0.00" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Preço de Venda (R$) *</label>
+        <input type="number" step="0.01" name="price" required value="0.00" class="form-control">
+      </div>
+
+      <div class="form-group full-width">
+        <label class="form-label">Estoque Inicial *</label>
+        <input type="number" name="stock" required value="0" min="0" class="form-control">
+      </div>
+
+      <div class="form-actions" style="margin-top: 1.5rem;">
+        <a href="{% url 'manage_products' %}" class="btn btn-secondary">Cancelar</a>
+        <button type="submit" class="btn">Salvar Produto</button>
+      </div>
+    </form>
+  </div>
+
+</section>
+{% endblock %}

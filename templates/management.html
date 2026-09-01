@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}
+  Gestão — MG
+{% endblock %}
+{% block content %}
+  <div class="container page">
+    <div class="management-head">
+      <div>
+        <p class="eyebrow">PAINEL DE GESTÃO</p>
+        <h1>Visão do negócio</h1>
+        <p>Vendas, clientes, estoque e financeiro em um só lugar.</p>
+      </div>
+      <div>
+        <a class="btn" href="{% url 'customer_list' %}">Contas de clientes</a>
+        <a class="btn" href="{% url 'manage_products' %}">Gerenciar Produtos</a>
+      </div>
+    </div>
+    <div class="metrics">
+      <div>
+        <small>RECEITAS</small><strong>R$ {{ income|floatformat:2 }}</strong>
+      </div>
+      <div>
+        <small>DESPESAS</small><strong>R$ {{ expense|floatformat:2 }}</strong>
+      </div>
+      <div>
+        <small>INVESTIMENTOS</small><strong>R$ {{ investment|floatformat:2 }}</strong>
+      </div>
+      <div class="highlight">
+        <small>LUCRO</small><strong>R$ {{ profit|floatformat:2 }}</strong>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="panel">
+        <h3>Resumo operacional</h3>
+        <div class="statline">
+          <span>Clientes cadastrados</span><b>{{ customers_count }}</b>
+        </div>
+        <div class="statline">
+          <span>Produtos ativos</span><b>{{ products_count }}</b>
+        </div>
+        <div class="statline">
+          <span>Pedidos realizados</span><b>{{ orders_count }}</b>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Estoque baixo</h3>{% for p in stock_low %}
+          <div class="statline">
+            <span>{{ p.name }}</span><b>{{ p.stock }} un.</b>
+          </div>
+        {% empty %}
+          <p>Nenhum produto com estoque crítico.</p>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Pedidos recentes</h3>{% for o in recent_orders %}
+        <div class="order-row">
+          <span>#{{ o.pk }}</span><strong>{{ o.customer.name }}</strong><span>{{ o.created_at|date:'d/m/Y H:i' }}</span><strong>R$ {{ o.total|floatformat:2 }}</strong><a href="{% url 'order_detail' o.pk %}">Abrir</a>
+        </div>
+      {% empty %}
+        <p>Nenhum pedido ainda.</p>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

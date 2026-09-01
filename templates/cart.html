@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}
+  Minha sacola — MG COSMETICOS
+{% endblock %}
+
+{% block content %}
+  <div class="container page">
+    <p class="eyebrow">SUA COMPRA</p>
+    <h1>Minha sacola</h1>
+
+    {% if items %}
+      <div class="cart-layout">
+        <div>
+          {% for item in items %}
+            <div class="cart-item">
+              <div class="mini-img">BR</div>
+              <div>
+                <strong>{{ item.product.name }}</strong>
+                <p>{{ item.quantity }} × R$ {{ item.product.price|floatformat:2 }}</p>
+              </div>
+              <strong>R$ {{ item.subtotal|floatformat:2 }}</strong>
+              <a href="{% url 'remove_from_cart' item.product.pk %}">Remover</a>
+            </div>
+          {% endfor %}
+        </div>
+
+        <aside class="summary">
+          <h3>Resumo</h3>
+          <div>
+            <span>Total</span>
+            <strong>R$ {{ total|floatformat:2 }}</strong>
+          </div>
+
+          <!-- Botão para retornar ao catálogo -->
+          <a class="btn btn-secondary full" href="{% url 'home' %}#produtos" style="margin-bottom: 0.5rem; text-align: center;">
+            Continuar comprando
+          </a>
+
+          <!-- Botão para fechar o pedido -->
+          <a class="btn full" href="{% url 'checkout' %}">
+            Finalizar pedido
+          </a>
+        </aside>
+      </div>
+    {% else %}
+      <div class="empty">
+        Sua sacola está vazia. <a href="{% url 'home' %}#produtos">Voltar à loja</a>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

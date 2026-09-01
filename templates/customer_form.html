@@ -1,0 +1,48 @@
+{% extends 'base.html' %} {# Altere para o nome do seu template base se houver #}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Cadastrar Novo Cliente</h2>
+    
+    <form method="post" class="mt-3">
+        {% csrf_token %}
+        
+        <!-- Preserva a URL de retorno (checkout) quando informada -->
+        {% if next_url %}
+            <input type="hidden" name="next" value="{{ next_url }}">
+        {% endif %}
+        
+        <div class="mb-3">
+            <label class="form-label">{{ form.name.label }}</label>
+            {{ form.name }}
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">{{ form.email.label }}</label>
+            {{ form.email }}
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">{{ form.phone.label }}</label>
+            {{ form.phone }}
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">{{ form.address.label }}</label>
+            {{ form.address }}
+        </div>
+
+        <div class="mb-3 form-check">
+            {{ form.credit_enabled }}
+            <label class="form-check-label">{{ form.credit_enabled.label }}</label>
+        </div>
+
+        <button type="submit" class="btn btn-success">Salvar Cliente</button>
+        
+        <!-- Retorna para o checkout se veio de lá, ou para a lista de clientes por padrão -->
+        <a href="{% if next_url %}{{ next_url }}{% else %}{% url 'customer_list' %}{% endif %}" class="btn btn-secondary">
+            Cancelar
+        </a>
+    </form>
+</div>
+{% endblock %}

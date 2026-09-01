@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}
+  {{ product.name }} — Belle Rosa
+{% endblock %}
+{% block content %}
+  <div class="container detail">
+    <div class="detail-img">
+      {% if product.image %}
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" />
+      {% else %}
+        <span>BR</span>
+      {% endif %}
+    </div>
+    <div class="detail-copy">
+      <p class="eyebrow">{{ product.category.name }}</p>
+      <h1>{{ product.name }}</h1>
+      <p>{{ product.description }}</p>
+      <div class="detail-price">R$ {{ product.price|floatformat:2 }}</div>
+      <p class="stock">{{ product.stock }} unidades disponíveis</p><a class="btn" href="{% url 'add_to_cart' product.pk %}">Adicionar à sacola</a>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block title %}
+  Conta — {{ customer.name }}
+{% endblock %}
+{% block content %}
+  <div class="container page">
+    <div class="management-head">
+      <div>
+        <p class="eyebrow">CONTA DO CLIENTE</p>
+        <h1>{{ customer.name }}</h1>
+        <p>{{ customer.email|default:'Sem e-mail' }} · {{ customer.phone|default:'Sem telefone' }}</p>
+      </div>
+      <a class="btn" href="{% url 'customer_statement_pdf' customer.pk %}">Baixar extrato PDF</a>
+    </div>
+
+    <!-- Indicadores Financeiros -->
+    <div class="metrics">
+      <div>
+        <small>TOTAL COMPRADO</small>
+        <strong>R$ {{ customer.total_credit|floatformat:2 }}</strong>
+      </div>
+      <div>
+        <small>TOTAL PAGO</small>
+        <strong>R$ {{ customer.total_paid|floatformat:2 }}</strong>
+      </div>
+      <div class="highlight">
+        <small>SALDO DEVEDOR</small>
+        <strong>R$ {{ customer.balance|floatformat:2 }}</strong>
+      </div>
+    </div>
+
+    <!-- EXTRATO UNIFICADO (Compras e Pagamentos juntos) -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>Extrato Unificado da Conta</h3>
+      </div>
+      
+      <div class="table-responsive">
+        <table class="products-table" style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--border, #eee); text-align: left;">
+              <th style="padding: 10px;">Data/Hora</th>
+              <th style="padding: 10px;">Tipo</th>
+              <th style="padding: 10px;">Descrição</th>
+              <th style="padding: 10px; text-align: right;">Valor (R$)</th>
+              <th style="padding: 10px; text-align: right;">Saldo Devedor (R$)</th>
+              <th style="padding: 10px; text-align: center;">Ação</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in statement_items %}
+              <tr style="border-bottom: 1px solid var(--border, #f0f0f0);">
+                <td style="padding: 10px;">
+                  <strong>{{ item.date|date:'d/m/Y' }}</strong>
+                  <br>
+                  <small style="color: #666;">{{ item.date|date:'H:i' }}</small>
+                </td>
+                
+                <td style="padding: 10px;">
+                  {% if item.type == 'DEBIT' %}
+                    <span style="background: #ffebe9; color: #cf222e; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">
+                      Compra (-)
+                    </span>
+                  {% else %}
+                    <span style="background: #dafbe1; color: #1a7f37; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">
+                      Pagamento (+)
+                    </span>
+                  {% endif %}
+                </td>
+                
+                <td style="padding: 10px;">
+                  <strong>{{ item.description }}</strong>
+                  {% if item.type == 'DEBIT' and item.object.items.all %}
+                    <br>
+                    <small style="color: #666;">
+                      Itens: 
+                      {% for order_item in item.object.items.all %}
+                        {{ order_item.quantity }}x {{ order_item.product.name }}{% if not forloop.last %}, {% endif %}
+                      {% endfor %}
+                    </small>
+                  {% endif %}
+                </td>
+                
+                <td style="padding: 10px; text-align: right; font-weight: bold; {% if item.type == 'DEBIT' %}color: #cf222e;{% else %}color: #1a7f37;{% endif %}">
+                  {% if item.type == 'DEBIT' %}
+                    + R$ {{ item.amount|floatformat:2 }}
+                  {% else %}
+                    - R$ {{ item.amount|floatformat:2 }}
+                  {% endif %}
+                </td>
+
+                <td style="padding: 10px; text-align: right; font-weight: bold;">
+                  R$ {{ item.running_balance|floatformat:2 }}
+                </td>
+
+                <td style="padding: 10px; text-align: center;">
+                  {% if item.type == 'DEBIT' %}
+                    <a href="{% url 'order_detail' item.object.pk %}">Ver compra →</a>
+                  {% else %}
+                    <span style="color: #888;">—</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="6" style="padding: 20px; text-align: center; color: #666;">
+                  Nenhuma movimentação registrada para este cliente.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Painel para Registrar Pagamento -->
+    {% if customer.balance > 0 %}
+      <div class="panel payment-panel">
+        <h3>Registrar pagamento da conta</h3>
+        <form method="post" action="{% url 'payment_create' customer.pk %}" class="payment-form">
+          {% csrf_token %}
+          <input type="number" name="amount" step="0.01" min="0.01" max="{{ customer.balance }}" placeholder="Valor pago" required />
+          <select name="method">
+            <option value="cash">Dinheiro</option>
+            <option value="pix">PIX</option>
+            <option value="card">Cartão</option>
+            <option value="transfer">Transferência</option>
+          </select>
+          <button class="btn">Registrar pagamento</button>
+        </form>
+      </div>
+    {% endif %}
+
+  </div>
+{% endblock %}

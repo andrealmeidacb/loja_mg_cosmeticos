@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Gestão de Produtos — MG COSMETICOS{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'css/manage_products.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="container shop manage-products-section">
+  
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">PAINEL DE CONTROLE</p>
+      <h2>Gestão de Produtos</h2>
+    </div>
+
+    <div class="header-actions">
+      <!-- Botão que NAVEGA para a tela separada de cadastro -->
+      <a href="{% url 'create_product' %}" class="btn">+ Cadastrar Novo Produto</a>
+
+      <!-- Formulário de Busca -->
+      <form class="search search-form" method="get" action="{% url 'manage_products' %}">
+        <input type="text" name="q" value="{{ q }}" placeholder="Buscar por Nome ou Código ID..." class="search-input">
+        <button type="submit" class="btn">Buscar</button>
+        {% if q %}
+          <a href="{% url 'manage_products' %}" class="btn btn-secondary">Limpar</a>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+
+  <!-- Mensagens de Alerta (Exibe a confirmação após salvar na outra tela) -->
+  {% if messages %}
+    <div class="messages-container">
+      {% for message in messages %}
+        <div class="alert-message {% if message.tags == 'success' %}alert-success{% else %}alert-error{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- TABELA DE PRODUTOS -->
+  <div class="table-container">
+    <table class="products-table">
+      <thead>
+        <tr>
+          <th class="col-id">Cód (ID)</th>
+          <th>Produto</th>
+          <th>Categoria</th>
+          <th class="col-cost">Custo (R$)</th>
+          <th class="col-price">Venda (R$)</th>
+          <th class="col-stock">Estoque</th>
+          <th class="col-action">Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for product in products %}
+        <tr>
+          <td class="col-id">#{{ product.id }}</td>
+          <td><strong class="product-name">{{ product.name }}</strong></td>
+          <td><span class="badge-category">{{ product.category.name }}</span></td>
+          
+          <form method="post" action="{% url 'update_product_stock_price' product.pk %}">
+            {% csrf_token %}
+            <td>
+              <input type="number" step="0.01" name="cost" value="{{ product.cost|stringformat:'.2f' }}" class="table-input">
+            </td>
+            <td>
+              <input type="number" step="0.01" name="price" value="{{ product.price|stringformat:'.2f' }}" required class="table-input">
+            </td>
+            <td>
+              <input type="number" name="stock" value="{{ product.stock }}" min="0" required class="table-input">
+            </td>
+            <td class="col-action">
+              <button type="submit" class="btn btn-table-save">Salvar</button>
+            </td>
+          </form>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="empty-row">
+            Nenhum produto cadastrado{% if q %} para "{{ q }}"{% endif %}.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</section>
+{% endblock %}

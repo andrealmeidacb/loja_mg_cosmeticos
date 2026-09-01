@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Finalizar pedido — MG
+{% endblock %}
+
+{% block content %}
+  <div class="container page">
+    <p class="eyebrow">FINALIZAÇÃO</p>
+    <h1>Dados da compra</h1>
+    <form method="post" class="checkout">
+      {% csrf_token %}
+      <label>Nome<input required name="name" /></label>
+      <label>E-mail<input type="email" name="email" /></label>
+      <label>Telefone<input name="phone" /></label>
+      <a href="{% url 'customer_create' %}?next={{ request.path }}" class="btn btn-primary">Cadastrar Novo Cliente</a>
+
+      <label>
+        Forma de pagamento<select name="payment_method" id="payment_method">
+          <option value="cash">À vista</option>
+          <option value="credit">Anotar na conta do cliente</option>
+        </select>
+      </label>
+
+      <div id="due-box" style="display:none">
+        <label>Vencimento da conta<input type="date" name="due_date" /></label>
+      </div>
+
+      <!-- Campo de Desconto -->
+      <label>Desconto (R$)<input type="number" step="0.01" min="0" name="discount" id="discount" placeholder="0,00" oninput="calculateTotal()" /></label>
+
+      <!-- Resumo do Valor do Pedido -->
+      <div class="checkout-total checkout-summary">
+        <div>
+          Subtotal: <strong>R$ <span id="subtotal-display">{{ total|floatformat:2 }}</span></strong>
+        </div>
+        <div class="discount-line">
+          Desconto: <strong>- R$ <span id="discount-display">0,00</span></strong>
+        </div>
+        <hr />
+        <div class="total-line">
+          Total a pagar: <strong>R$ <span id="final-total-display">{{ total|floatformat:2 }}</span></strong>
+        </div>
+      </div>
+
+      <button class="btn" type="submit">Confirmar pedido</button>
+    </form>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Alternar exibição do campo de vencimento
+      const paymentSelect = document.getElementById('payment_method')
+      const dueBox = document.getElementById('due-box')
+    
+      if (paymentSelect && dueBox) {
+        paymentSelect.addEventListener('change', function () {
+          dueBox.style.display = this.value === 'credit' ? 'block' : 'none'
+        })
+      }
+    })
+    
+    // Função global para recalcular o valor total ao digitar o desconto
+    function calculateTotal() {
+      const subtotalDisplay = document.getElementById('subtotal-display')
+      if (!subtotalDisplay) return
+    
+      // Obtém o valor do subtotal renderizado pelo Django
+      const rawSubtotalText = subtotalDisplay.innerText.replace('.', '').replace(',', '.')
+      const subtotal = parseFloat(rawSubtotalText) || 0
+    
+      const discountInput = document.getElementById('discount')
+      let discount = parseFloat(discountInput.value.replace(',', '.')) || 0
+    
+      // Validações do desconto
+      if (discount < 0) discount = 0
+      if (discount > subtotal) discount = subtotal
+    
+      const finalTotal = subtotal - discount
+    
+      // Atualiza a exibição na tela formatada em padrão brasileiro
+      document.getElementById('discount-display').innerText = discount.toFixed(2).replace('.', ',')
+      document.getElementById('final-total-display').innerText = finalTotal.toFixed(2).replace('.', ',')
+    }
+  </script>
+{% endblock %}

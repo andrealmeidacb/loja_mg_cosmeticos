@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}
+  Contas de clientes — MG
+{% endblock %}
+{% block content %}
+  <div class="container page">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">FIADO & CONTAS</p>
+        <h1>Contas de clientes</h1>
+        <p>Consulte compras, saldos, pagamentos e extratos.</p>
+      </div>
+      <form class="search">
+        <a href="{% url 'customer_create' %}" class="btn btn-primary">Cadastrar Novo Cliente</a>
+        <input name="q" value="{{ q }}" placeholder="Buscar cliente..." />
+        <button>Buscar</button>
+      </form>
+    </div>
+    <div class="panel customer-table">
+      {% for c in customers %}
+        <a class="customer-row" href="{% url 'customer_detail' c.pk %}">
+          <div>
+            <strong>{{ c.name }}</strong>
+            <small>{{ c.phone|default:'Sem telefone' }}</small>
+          </div>
+          <span>{{ c.orders.count }} compras</span>
+          <strong class="balance">R$ {{ c.balance|floatformat:2 }}</strong>
+          <span>Ver conta →</span>
+        </a>
+      {% empty %}
+        <p>Nenhum cliente encontrado.</p>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}
+  Pedido confirmado — MG COSMETICOS
+{% endblock %}
+{% block content %}
+  <div class="container success">
+    <div class="success-icon">✓</div>
+    <p class="eyebrow">TUDO CERTO</p>
+    <h1>Pedido #{{ order.pk }} confirmado!</h1>
+    <p>O pedido foi registrado e a venda também entrou automaticamente no controle financeiro.</p><a class="btn" href="{% url 'home' %}">Continuar comprando</a>
+  </div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      {% block title %}
+        MG COSMETICOS
+      {% endblock %}
+    </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="container nav">
+        <a href="{% url 'home' %}" class="brand">
+          <span>BR</span><div>
+            MG COSMETICOS<small>cosméticos & lingerie</small>
+          </div>
+        </a>
+        <nav>
+          <a href="{% url 'home' %}">Loja</a>
+          <a href="{% url 'management_dashboard' %}">Gestão</a>
+          <a class="cart-link" href="{% url 'cart' %}">Sacola <b>♡</b></a>
+        </nav>
+      </div>
+    </header>
+    <main>
+      {% block content %}
+      {% endblock %}
+    </main>
+    <footer>
+      <div class="container footer">
+        <div>
+          <strong>MG COSMETICOS</strong><p>Beleza, cuidado e autoestima em cada detalhe.</p>
+        </div>
+        <div>Cosméticos · Lingerie · Atendimento personalizado</div>
+      </div>
+    </footer>
+  </body>
+</html>

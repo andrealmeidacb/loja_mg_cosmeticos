@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}
+  Compra: {{ order.pk }} — MG
+{% endblock %}
+{% block content %}
+  <div class="container page">
+    <div class="management-head">
+      <div>
+        <p class="eyebrow">DETALHES DA COMPRA</p>
+        <h1>Compra: {{ order.pk }}</h1>
+        <p>{{ order.customer.name }} · {{ created_at_formatted }}</p>
+      </div>
+      <a class="btn" href="{% url 'order_pdf' order.pk %}">Enviar / baixar PDF</a>
+    </div>
+
+    <div class="panel">
+      <h3>Produtos comprados</h3>
+      {% for item in order.items.all %}
+        <div class="order-row">
+          <span>{{ item.product.name }}</span>
+          <strong>R$ {{ item.subtotal|floatformat:2 }}</strong>
+        </div>
+      {% endfor %}
+
+      <div class="statline" style="margin-top: 15px;">
+        <span>Subtotal</span>
+        <strong>R$ {{ order.total|floatformat:2 }}</strong>
+      </div>
+
+      {% if order.discount > 0 %}
+        <div class="statline" style="color: #d9534f;">
+          <span>Desconto</span>
+          <strong>- R$ {{ order.discount|floatformat:2 }}</strong>
+        </div>
+      {% endif %}
+
+      <div class="checkout-total">
+        <strong>Total do pedido</strong>
+        <strong>R$ {{ order.final_total|floatformat:2 }}</strong>
+      </div>
+
+      <div class="statline">
+        <span>Total pago</span>
+        <strong>R$ {{ order.paid_amount|floatformat:2 }}</strong>
+      </div>
+
+      <div class="statline">
+        <span>Saldo desta compra</span>
+        <strong>R$ {{ order.balance|floatformat:2 }}</strong>
+      </div>
+    </div>
+  </div>
+{% endblock %}
