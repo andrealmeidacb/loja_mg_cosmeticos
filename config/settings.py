@@ -20,11 +20,13 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # Suporte a arquivos estáticos em produção
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -59,8 +61,16 @@ TIME_ZONE = "America/Fortaleza"
 USE_I18N = True
 USE_TZ = True
 
+# --- ARQUIVOS ESTÁTICOS & MÍDIA ---
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+
+# Pasta onde o collectstatic vai reunir os arquivos no servidor (Resolve o erro do Render)
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Otimização de entrega de arquivos estáticos via WhiteNoise
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
