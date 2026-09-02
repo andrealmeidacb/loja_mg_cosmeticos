@@ -2,3 +2,6 @@ Django>=5.2,<6.0
 mysqlclient>=2.2
 Pillow>=11.0
 reportlab>=4.0
+gunicorn
+whitenoise
+dj-database-url
